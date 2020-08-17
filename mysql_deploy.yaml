@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-airflow
+spec:
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306
+  selector:
+    app: mysql-airflow
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: mysql-airflow
+spec:
+  selector:
+    matchLabels:
+      app: mysql-airflow
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql-airflow
+    spec:
+      containers:
+      - image: mysql:5.7
+        name: mysql-airflow
+        resources:
+          requests:
+            memory: "150Mi"
+            cpu: .2
+          limits:
+            memory: "650Mi"
+            cpu: .8
+        env:
+          # Use secret in real usage
+        - name: MYSQL_ROOT_PASSWORD
+          value: {root_pwd}
+        ports:
+        - containerPort: 3306
+          name: mysql 
+        volumeMounts:
+        - name: mysql-persistent-storage
+          subPath: "mysql"
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: data-mysql-airflow
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: data-mysql-airflow
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi          
