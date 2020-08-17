@@ -1,0 +1,80 @@
+# Source: airflow/templates/configmap-env.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "airflow-env"
+  labels:
+    app: airflow
+    chart: airflow-0.1
+    release: airflow
+    heritage: Helm
+data:
+  ## Force UTC timezone
+  TZ: Asia/Kolkata 
+  ## Postgres DB configuration
+  # POSTGRES_HOST: "postgres-service.default.svc.cluster.local"
+  # POSTGRES_PORT: "5432"
+  # POSTGRES_DB: "airflow"
+  AIRFLOW__CORE__SQL_ALCHEMY_CONN: "mysql://uname:pwd@mysql-airflow.airflow.svc.cluster.local:3306/airflow"
+  FERNET_KEY: "SKJOM8uzLY6xAxPt8qFN2BcprPl-iPz_tMt9ktmfd_E="
+  ## Custom Airflow settings
+  AIRFLOW__CORE__EXECUTOR: "KubernetesExecutor" 
+  AIRFLOW__CORE__DONOT_PICKLE: "false"
+  AIRFLOW__CORE__DAGS_FOLDER: "/user/airflow/gitmount/dags"
+  AIRFLOW__CORE__PLUGINS_FOLDER: "/user/airflow/gitmount/plugins"
+  AIRFLOW__CORE__BASE_LOG_FOLDER: "/opt/airflow/logs"
+  AIRFLOW__CORE__DAG_PROCESSOR_MANAGER_LOG_LOCATION: "/opt/airflow/logs/dag_processor_manager/dag_processor_manager.log"
+  AIRFLOW__SCHEDULER__CHILD_PROCESS_LOG_DIRECTORY: "/opt/airflow/logs/scheduler"
+  AIRFLOW__WEBSERVER__BASE_URL: "http://localhost:8080"
+  AIRFLOW__WEBSERVER__RBAC: "true"
+  # Disabling XCom pickling for forward compatibility
+  AIRFLOW__CORE__ENABLE_XCOM_PICKLING: "false"
+  GIT_SYNC_BRANCH: "master"
+  GIT_SYNC_ROOT: "/git"
+  GIT_SYNC_DEST: "gitmount"
+  GIT_SYNC_DEPTH: "1"
+  GIT_SYNC_ONE_TIME: "false"
+  GIT_SYNC_WAIT: "20"
+
+
+  GIT_SYNC_REPO: "https://github.com/username/airflow.git"
+  GIT_SYNC_USERNAME: {uname}
+  GIT_SYNC_PASSWORD: {pwd_token}
+
+
+
+
+
+  # Note: changing `Values.airflow.config` won't change the configmap checksum and so won't make
+  # the pods to restart
+  AIRFLOW__KUBERNETES__NAMESPACE: "airflow"
+  AIRFLOW__KUBERNETES__AIRFLOW_CONFIGMAP: "airflow-configmap"
+  AIRFLOW__KUBERNETES__DAGS_IN_IMAGE: "False"
+  AIRFLOW__KUBERNETES__RUN_AS_USER: "50000"  
+  AIRFLOW__KUBERNETES__GIT_REPO: "https://username:password@github.com/username/airflow.git"  
+  AIRFLOW__KUBERNETES__GIT_PASSWORD: "{pwd}"
+  AIRFLOW__KUBERNETES__GIT_BRANCH: "master"
+  AIRFLOW__KUBERNETES__GIT_DAGS_FOLDER_MOUNT_POINT: "/user/airflow"
+  AIRFLOW__KUBERNETES__GIT_SYNC_DEST: "gitmount"
+  AIRFLOW__KUBERNETES__GIT_SYNC_ROOT: "/git"
+  AIRFLOW__KUBERNETES__GIT_SUBPATH: "gitmount/dags"
+  AIRFLOW__KUBERNETES__GIT_SYNC_RUN_AS_USER: "50000"
+  ##AIRFLOW__KUBERNETES__KUBE_CLIENT_REQUEST_ARGS: "{\"_request_timeout\":60}"
+  ##AIRFLOW__KUBERNETES__KUBE_CLIENT_REQUEST_ARGS: '{\"_request_timeout\":60}'
+  AIRFLOW__KUBERNETES__WORKER_CONTAINER_IMAGE_PULL_POLICY: "IfNotPresent"
+  AIRFLOW__KUBERNETES__WORKER_CONTAINER_REPOSITORY: "apache/airflow"
+  AIRFLOW__KUBERNETES__WORKER_CONTAINER_TAG: "1.10.10.1-alpha2-python3.7"
+  AIRFLOW__KUBERNETES__WORKER_SERVICE_ACCOUNT_NAME: "airflow"
+  AIRFLOW__KUBERNETES__DELETE_WORKER_PODS: "true"
+  ##AIRFLOW__KUBERNETES__LOGS_VOLUME_SUBPATH: "logs"
+  AIRFLOW__KUBERNETES__LOGS_VOLUME_CLAIM: "airflow-logs"
+  ##AIRFLOW__SMTP__SMTP_HOST: "smtp.sendgrid.net"
+  ##AIRFLOW__SMTP__SMTP_PORT: "465"
+  ##AIRFLOW__SMTP__SMTP_USER: ""
+  ##AIRFLOW__SMTP__SMTP_PASSWORD: ""
+  ##AIRFLOW__SMTP__SMTP_MAIL_FROM: ""
+  ##AIRFLOW__SMTP__SMTP_STARTTLS: "False"
+  ##AIRFLOW__SMTP__SMTP_SSL: "True"
+  
+
+  
